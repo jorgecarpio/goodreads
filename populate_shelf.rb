@@ -7,7 +7,7 @@ require 'net/http'
 require 'json'
 
 # goodreads key
-key = 'yourkey'
+key = ARGV[1]
 
 # Param check
 if ARGV[0].nil?
@@ -61,13 +61,19 @@ book_titles.each do |i|
     sleep(1)
 end
 
-puts isbns
+
 # 3rd - Use ISBN numbers to retrieve goodreads ID numbers
-# isbns.each do |k|
-    # missing stuff
-    # goodreads api example: https://www.goodreads.com/book/isbn_to_id?isbn=&key=#{key}
-# end
+goodreads_ids = Array.new()
+
+isbns.each do |isbn|
+    uri_gr = URI("https://www.goodreads.com/book/isbn_to_id?&isbn=#{isbn}&key=#{key}")
+    res_gr = Net::HTTP.get(uri_gr)
+    goodreads_ids.push(res_gr)
+end
+
+
 # 4th - Create bookshelf on goodreads
+
 
 # 5th - Add books, via their goodreads IDs, to bookshelf
 
