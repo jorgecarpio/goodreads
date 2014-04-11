@@ -4,6 +4,7 @@
 # Library for HTTP and URI stuff
 require 'rubygems'
 require 'net/http'
+require 'json'
 
 # goodreads key
 key = 'yourkey'
@@ -44,10 +45,11 @@ f.close
 isbns = Array.new()
 
 book_titles.each do |i|
-    uri = URI("https://www.googleapis.com/books/v1/volumes?q=#{i}")
+    encoded_title = URI::encode i
+    uri = URI("https://www.googleapis.com/books/v1/volumes?q=#{encoded_title}")
     # need author, too
     # ?q=#{i}+inauthor:#{author}
-    res = Net:HTTP.get(uri) # => String
+    res = Net::HTTP.get(uri) # => String
     parsed = JSON.parse(res) # => Hash
     # Brittle code ahead
     isbn = parsed["items"].first["volumeInfo"]["industryIdentifiers"][1]["identifier"]
@@ -56,13 +58,15 @@ book_titles.each do |i|
         isbn = parsed["items"].first["volumeInfo"]["industryIdentifiers"][0]["identifier"]
     end
     isbns.push(isbn)
+    sleep(1)
 end
 
+puts isbns
 # 3rd - Use ISBN numbers to retrieve goodreads ID numbers
-isbns.each do |k|
+# isbns.each do |k|
     # missing stuff
     # goodreads api example: https://www.goodreads.com/book/isbn_to_id?isbn=&key=#{key}
-end
+# end
 # 4th - Create bookshelf on goodreads
 
 # 5th - Add books, via their goodreads IDs, to bookshelf
