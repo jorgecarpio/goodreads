@@ -21,8 +21,6 @@ request_token = consumer.get_request_token
 # open this URL in the browser and authorize
 request_token.authorize_url
 
-access_token = request_token.get_request_token
-
 # request 200 per page
 uri = URI.parse "http://www.goodreads.com/review/list?format=xml&v=2&id=#{user_id}&shelf=to-read&sort=title&key=#{key}&per_page=200"
 
