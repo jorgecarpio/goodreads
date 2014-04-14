@@ -5,13 +5,25 @@
 require 'rubygems'
 require 'net/http'
 require 'json'
+require 'OAuth'
 
 # goodreads key
 key = ARGV[1]
+secret = ARGV[2]
+
+# Register app with goodreads
+consumer = OAuth::Consumer.new(key,secret, :site => 'http://www.goodreads.com')
+request_token = consumer.get_request_token
+# open this URL in the browser and authorize
+request_token.authorize_url
+
 
 # Param check
-if ARGV[0].nil?
-    puts "Missing Parameter"
+if ARGV[0].nil? or ARGV[1].nil? or ARGV[2].nil?
+    puts "Missing Parameter(s)"
+    puts "First param is text file of books."
+    puts "Second is your developer key."
+    puts "Third is your secret."
     exit
 elsif not File.exist?(ARGV[0])
     puts "Missing file"
@@ -66,7 +78,7 @@ end
 goodreads_ids = Array.new()
 
 isbns.each do |isbn|
-    uri_gr = URI("https://www.goodreads.com/book/isbn_to_id?&isbn=#{isbn}&key=#{key}")
+    uri_gr = URI("https://www.goodreads.com/book/isbn_to_id?isbn=#{isbn}&key=#{key}")
     res_gr = Net::HTTP.get(uri_gr)
     goodreads_ids.push(res_gr)
 end
@@ -76,5 +88,11 @@ end
 
 
 # 5th - Add books, via their goodreads IDs, to bookshelf
+# Takes a comma-separated list of book ids
+# and adds them to the shelf name var (name of imported text list of books)
+# requires OAuth
+idlist = goodreads_ids.join(",")
+uri_id = URI("https://goodreads.com/shelf/add_books_to_shelves.xml?bookids=#{idlist}&shelves=#{shelf_name}")
+res_id = Net::HTTP.post(uri_id)
 
 # 6th - Verify
