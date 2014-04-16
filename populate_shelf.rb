@@ -29,18 +29,18 @@ elsif not File.exist?(ARGV[0])
     puts "Missing file"
     exit
 else
-    $file = ARGV[0]
+    file = ARGV[0]
 end
 
 # parse filename to use as bookshelf name
-$shelf_name = File.basename($file, ".txt")
+shelf_name = File.basename(file, ".txt")
 
 # Steps
 # 1st - Read in text file of books
 # NOTE: Will need to get author, otherwise results will be too broad
 book_titles = Array.new
 
-f = File.open($file, "r")
+f = File.open(file, "r")
 f.each_line do |line|
     book_titles.push line
 end
@@ -92,7 +92,7 @@ end
 # and adds them to the shelf name var (name of imported text list of books)
 # requires OAuth
 idlist = goodreads_ids.join(",")
-uri_id = URI("https://goodreads.com/shelf/add_books_to_shelves.xml?bookids=#{idlist}&shelves=#{shelf_name}")
-res_id = Net::HTTP.post(uri_id)
+uri_id = URI('https://goodreads.com/shelf/add_books_to_shelves.xml')
+res_id = Net::HTTP.post_form(uri_id, 'bookids' => goodreads_ids, 'shelves' => shelf_name)
 
 # 6th - Verify
