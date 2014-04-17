@@ -2,7 +2,6 @@
 # Pass in filename to script or barf
 
 # Library for HTTP and URI stuff
-require 'rubygems'
 require 'net/http'
 require 'json'
 require 'OAuth'

@@ -1,6 +1,3 @@
-# https://www.goodreads.com/api/oauth_example
-
-require 'rubygems'
 require 'OAuth'
 # require 'hpricot'
 # require 'rexml/document'
