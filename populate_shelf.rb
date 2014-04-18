@@ -16,7 +16,7 @@ request_token = consumer.get_request_token
 # open this URL in the browser and authorize
 request_token.authorize_url
 
-#then
+#then (you'll use this later)
 access_token = request_token.get_access_token
 
 # Param check
@@ -91,11 +91,8 @@ end
 # 5th - Add books, via their goodreads IDs, to bookshelf
 # Takes a comma-separated list of book ids
 # and adds them to the shelf name var (name of imported text list of books)
-# requires OAuth
 
-# works in browser (get instead of post) but in irb gives "not authorized."
 idlist = goodreads_ids.join(",")
-uri_id = URI("https://www.goodreads.com/shelf/add_books_to_shelves.xml?bookids=#{idlist}&shelves=#{shelf_name}")
-res_id = Net::HTTP.get(uri_id)
+res_add = access_token.post('/shelf/add_books_to_shelves.xml', {'bookids' => idlist, 'shelves' => shelf_name})
 
 # 6th - Verify
