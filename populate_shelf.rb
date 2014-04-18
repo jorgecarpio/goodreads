@@ -86,7 +86,7 @@ end
 
 
 # 4th - Create bookshelf on goodreads
-
+res_shelf = access_token.post('/user_shelves.xml', {'user_shelf[name]' => shelf_name})
 
 # 5th - Add books, via their goodreads IDs, to bookshelf
 # Takes a comma-separated list of book ids
