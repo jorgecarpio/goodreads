@@ -13,10 +13,14 @@ secret = ARGV[2]
 # Register app with goodreads
 consumer = OAuth::Consumer.new(key,secret, :site => 'http://www.goodreads.com')
 request_token = consumer.get_request_token
-# open this URL in the browser and authorize
-request_token.authorize_url
 
-#then (you'll use this later)
+
+auth_url = request_token.authorize_url
+puts "Open this URL in the browser to authorize"
+puts auth_url
+blah = $stdin.gets
+
+
 access_token = request_token.get_access_token
 
 # Param check
