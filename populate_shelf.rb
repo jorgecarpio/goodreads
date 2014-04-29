@@ -38,18 +38,23 @@ else
 end
 
 # parse filename to use as bookshelf name
-shelf_name = File.basename(file, ".txt")
+shelf_name = File.basename(file, '.txt')
 
 # Steps
 # 1st - Read in text file of books
 # NOTE: Will need to get author, otherwise results will be too broad
 book_titles = Array.new
 
-f = File.open(file, "r")
+f = File.open(file, 'r')
 f.each_line do |line|
     book_titles.push line
 end
 f.close
+
+# debugging
+# puts book_titles
+# stopit = $stdin.gets
+# end debugging
 
 # 2nd - Use book titles to retrieve list of ISBN numbers
 # Google API is
@@ -63,20 +68,44 @@ isbns = Array.new()
 
 book_titles.each do |i|
     encoded_title = URI::encode i
-    uri = URI("https://www.googleapis.com/books/v1/volumes?q=#{encoded_title}")
-    # need author, too
-    # ?q=#{i}+inauthor:#{author}
+    uri = URI("https://www.googleapis.com/books/v1/volumes?q=#{encoded_title}&printType=books&fields=items(volumeInfo/industryIdentifiers/type,volumeInfo/industryIdentifiers/identifier)")
     res = Net::HTTP.get(uri) # => String
     parsed = JSON.parse(res) # => Hash
-    # Brittle code ahead
-    isbn = parsed["items"].first["volumeInfo"]["industryIdentifiers"][1]["identifier"]
-    if isbn.nil?
-        # get the isbn10 number
-        isbn = parsed["items"].first["volumeInfo"]["industryIdentifiers"][0]["identifier"]
+    isbn = nil
+
+    parsed['items'].map { |book| 
+        identifiers = book['volume_info'] && book['volume_info']['industryIdentifiers']
+        isbn_identifier = idetifiers && identifiers.find{ |prop| 
+            ['ISBN_10', 'ISBN_13'].include? prop['type']}['identifier']
+    
+        isbn_identifier && isbn_identifier['identifier']
+    }.compact
+
+
+    parsed["items"].each do |j| # only continue if isbn is nil
+        break if not isbn.nil?
+        j["volumeInfo"]["industryIdentifiers"].each do |k|
+            next if k["type"] = "OTHER"
+                    isbn = k["identifier"]
+                    puts isbn
+                    isbns.push(isbn)
+                    sleep(1)
+                    break # K loop
+        end 
     end
-    isbns.push(isbn)
-    sleep(1)
-end
+
+#     if parsed["items"].first["volumeInfo"]["industryIdentifiers"][0]["type"] = "OTHER"
+#         # do stuff
+#     end
+
+#     isbn = parsed["items"].first["volumeInfo"]["industryIdentifiers"][1]["identifier"]
+#     if isbn.nil?
+#         # get the isbn10 number
+#         isbn = parsed["items"].first["volumeInfo"]["industryIdentifiers"][0]["identifier"]
+#     end
+#     isbns.push(isbn)
+#     sleep(1)
+# end
 
 
 # 3rd - Use ISBN numbers to retrieve goodreads ID numbers
@@ -96,7 +125,7 @@ res_shelf = access_token.post('/user_shelves.xml', {'user_shelf[name]' => shelf_
 # Takes a comma-separated list of book ids
 # and adds them to the shelf name var (name of imported text list of books)
 
-idlist = goodreads_ids.join(",")
+shelves = shelf_name + ',' + 'to-read'
+idlist = goodreads_ids.join(',')
 res_add = access_token.post('/shelf/add_books_to_shelves.xml', {'bookids' => idlist, 'shelves' => shelf_name})
 
-# 6th - Verify
