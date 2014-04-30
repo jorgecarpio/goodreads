@@ -67,9 +67,12 @@ book_titles.each do |i|
     uri = URI("https://www.googleapis.com/books/v1/volumes?q=#{encoded_title}&printType=books&fields=items(volumeInfo/industryIdentifiers/type,volumeInfo/industryIdentifiers/identifier,volumeInfo/title)")
     res = Net::HTTP.get(uri) # => String
     parsed = JSON.parse(res) # => Hash
-    
-    book_isbns = parsed['items'].map { |book| book['volumeInfo'].andand['industryIdentifiers'].andand.find{ |prop| ['ISBN_10', 'ISBN_13'].include? prop['type']}.andand['identifier']}.compact
-    isbns.push isbn_list.first
+    isbn = parsed['items'].andand.first['volumeInfo'].andand['industryIdentifiers'].andand.find{ |prop| ['ISBN_10', 'ISBN_13'].include? prop['type']}.andand['identifier']
+    if not isbn.nil?
+        isbns.push isbn
+    else
+        puts "ISBN for #{book} not found"
+    end
 end
 
 # 3rd - Use ISBN numbers to retrieve goodreads ID numbers
