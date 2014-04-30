@@ -5,6 +5,7 @@
 require 'net/http'
 require 'json'
 require 'OAuth'
+require 'andand'
 
 # goodreads key
 key = ARGV[1]
@@ -51,11 +52,6 @@ f.each_line do |line|
 end
 f.close
 
-# debugging
-# puts book_titles
-# stopit = $stdin.gets
-# end debugging
-
 # 2nd - Use book titles to retrieve list of ISBN numbers
 # Google API is
 # https://www.googleapis.com/books/v1/volumes?q=search+terms
@@ -71,42 +67,10 @@ book_titles.each do |i|
     uri = URI("https://www.googleapis.com/books/v1/volumes?q=#{encoded_title}&printType=books&fields=items(volumeInfo/industryIdentifiers/type,volumeInfo/industryIdentifiers/identifier)")
     res = Net::HTTP.get(uri) # => String
     parsed = JSON.parse(res) # => Hash
-    isbn = nil
-
-    parsed['items'].map { |book| 
-        identifiers = book['volume_info'] && book['volume_info']['industryIdentifiers']
-        isbn_identifier = idetifiers && identifiers.find{ |prop| 
-            ['ISBN_10', 'ISBN_13'].include? prop['type']}['identifier']
     
-        isbn_identifier && isbn_identifier['identifier']
-    }.compact
-
-
-    parsed["items"].each do |j| # only continue if isbn is nil
-        break if not isbn.nil?
-        j["volumeInfo"]["industryIdentifiers"].each do |k|
-            next if k["type"] = "OTHER"
-                    isbn = k["identifier"]
-                    puts isbn
-                    isbns.push(isbn)
-                    sleep(1)
-                    break # K loop
-        end 
-    end
-
-#     if parsed["items"].first["volumeInfo"]["industryIdentifiers"][0]["type"] = "OTHER"
-#         # do stuff
-#     end
-
-#     isbn = parsed["items"].first["volumeInfo"]["industryIdentifiers"][1]["identifier"]
-#     if isbn.nil?
-#         # get the isbn10 number
-#         isbn = parsed["items"].first["volumeInfo"]["industryIdentifiers"][0]["identifier"]
-#     end
-#     isbns.push(isbn)
-#     sleep(1)
-# end
-
+    book_isbns = parsed['items'].map { |book| book['volumeInfo'].andand['industryIdentifiers'].andand.find{ |prop| ['ISBN_10', 'ISBN_13'].include? prop['type']}.andand['identifier']}.compact
+    isbns.push isbn_list.first
+end
 
 # 3rd - Use ISBN numbers to retrieve goodreads ID numbers
 goodreads_ids = Array.new()
