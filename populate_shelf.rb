@@ -64,7 +64,7 @@ isbns = Array.new()
 
 book_titles.each do |i|
     encoded_title = URI::encode i
-    uri = URI("https://www.googleapis.com/books/v1/volumes?q=#{encoded_title}&printType=books&fields=items(volumeInfo/industryIdentifiers/type,volumeInfo/industryIdentifiers/identifier)")
+    uri = URI("https://www.googleapis.com/books/v1/volumes?q=#{encoded_title}&printType=books&fields=items(volumeInfo/industryIdentifiers/type,volumeInfo/industryIdentifiers/identifier,volumeInfo/title)")
     res = Net::HTTP.get(uri) # => String
     parsed = JSON.parse(res) # => Hash
     
