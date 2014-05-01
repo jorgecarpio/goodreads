@@ -78,7 +78,7 @@ book_titles.each do |i|
         puts "ISBN for #{i} not found"
         missing.push i
     end
-    sleep 2
+    sleep 3
 end
 
 # 3rd - Use ISBN numbers to retrieve goodreads ID numbers
@@ -100,6 +100,6 @@ res_shelf = access_token.post('/user_shelves.xml', {'user_shelf[name]' => shelf_
 
 shelves = shelf_name + ',' + 'to-read'
 idlist = goodreads_ids.join(',')
-res_add = access_token.post('/shelf/add_books_to_shelves.xml', {'bookids' => idlist, 'shelves' => shelf_name})
+res_add = access_token.post('/shelf/add_books_to_shelves.xml', {'bookids' => idlist, 'shelves' => shelves})
 puts 'Add these manually to GoodReads'
 puts missing
