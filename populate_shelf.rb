@@ -71,7 +71,7 @@ book_titles.each do |i|
     if not isbn.nil?
         isbns.push isbn
     else
-        puts "ISBN for #{book} not found"
+        puts "ISBN for #{i} not found"
     end
 end
 
