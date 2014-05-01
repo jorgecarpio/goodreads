@@ -63,6 +63,9 @@ f.close
 isbns = Array.new()
 
 book_titles.each do |i|
+    if not i.ascii_only?
+        i = i.encode('UTF-8')
+    end
     encoded_title = URI::encode i
     uri = URI("https://www.googleapis.com/books/v1/volumes?q=#{encoded_title}&printType=books&fields=items(volumeInfo/industryIdentifiers/type,volumeInfo/industryIdentifiers/identifier,volumeInfo/title)")
     res = Net::HTTP.get(uri) # => String
