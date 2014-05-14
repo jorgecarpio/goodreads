@@ -11,6 +11,26 @@ require 'andand'
 key = ARGV[1]
 secret = ARGV[2]
 
+# Param check
+if ARGV[0].nil? or ARGV[1].nil? or ARGV[2].nil?
+    puts "Missing Parameter(s)"
+    puts "First param is text file of books."
+    puts "Second is your developer key."
+    puts "Third is your secret."
+    exit
+end
+
+while not File.exist?(ARGV[0]) do
+    puts "Hello.  I can't locate #{ARGV[0]}"
+    puts "Please provide the location of your text list of books."
+    puts "e.g. /home/user/mylist.txt"
+    puts "Here is a list of files in this folder:"
+    puts Dir["*.*"]
+    ARGV[0] = $stdin.gets
+end
+
+file = ARGV[0]
+
 # Register app with goodreads
 consumer = OAuth::Consumer.new(key,secret, :site => 'http://www.goodreads.com')
 request_token = consumer.get_request_token
@@ -24,19 +44,8 @@ blah = $stdin.gets
 
 access_token = request_token.get_access_token
 
-# Param check
-if ARGV[0].nil? or ARGV[1].nil? or ARGV[2].nil?
-    puts "Missing Parameter(s)"
-    puts "First param is text file of books."
-    puts "Second is your developer key."
-    puts "Third is your secret."
-    exit
-elsif not File.exist?(ARGV[0])
-    puts "Missing file"
-    exit
-else
-    file = ARGV[0]
-end
+
+
 
 # parse filename to use as bookshelf name
 shelf_name = File.basename(file, '.txt')
