@@ -91,14 +91,22 @@ book_titles.each do |i|
 end
 
 # 3rd - Use ISBN numbers to retrieve goodreads ID numbers
-goodreads_ids = Array.new()
+# goodreads_ids = Array.new()
 
-isbns.each do |isbn|
-    uri_gr = URI("https://www.goodreads.com/book/isbn_to_id?isbn=#{isbn}&key=#{key}")
-    res_gr = Net::HTTP.get(uri_gr)
-    goodreads_ids.push(res_gr)
+# isbns.each do |isbn|
+#     uri_gr = URI("https://www.goodreads.com/book/isbn_to_id?isbn=#{isbn}&key=#{key}")
+#     res_gr = Net::HTTP.get(uri_gr)
+#     goodreads_ids.push(res_gr)
+# end
+
+def convert_isbn_to_goodreads_id(isbn_array)
+    goodreads_ids = isbn_array.map { |isbn|
+        Net::HTTP.get("https://www.goodreads.com/book/isbn_to_id?isbn=#{isbn}&key=#{key}")
+    }
+    return goodreads_ids
 end
 
+goodreads_ids = convert_isbn_to_goodreads_id(isbns)
 
 # 4th - Create bookshelf on goodreads
 res_shelf = access_token.post('/user_shelves.xml', {'user_shelf[name]' => shelf_name})
